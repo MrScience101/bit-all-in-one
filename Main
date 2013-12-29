@@ -1,0 +1,901 @@
+-- bit not the byte
+
+-- Use this function to perform your initial setup
+function setup()
+    sceneTimer = 0
+    playerX = 0
+    playerY = 0
+    loopY = 0
+    pause = false
+    response = nil
+    lastResponse = nil
+    theEnd = false
+   -- scene1Playing = true
+    scene1Playing = true
+    scene2Playing = false
+    scene3Playing = false
+   -- scene2Playing = false
+    spikedEndScenePlaying = false
+    
+    Scene1Setup()
+    
+    scene2SetupComplete = false
+    scene3SetupComplete = false
+    
+    
+    --delete when done? 
+    drawPlayer = true
+end
+
+
+-- This function gets called once every frame
+function draw()
+    
+    --sound(SOUND_JUMP, 18996)
+    -- This sets a dark background color 
+   if scene1Playing == true then
+      Scene1()
+     lastResponse = response
+   end
+   
+   if scene1Playing == false and scene3Playing == false then 
+   scene2Playing = true
+   end
+
+    if scene2Playing == true then
+       Scene2()
+    end
+    
+    if spikedEndScenePlaying == true then
+        SpikedSceneEnding()
+    end
+
+    if scene1Playing == false and scene2Playing == false then
+        scene3Playing = true
+    end
+    
+    if scene3Playing == true and spikedEndScenePlaying == false then
+        Scene3()
+    end
+
+end
+
+
+function SpikedSceneEnding()
+  -- print(drawPlayer)
+    background(0, 0, 0, 255)
+    sprite("Platformer Art:Spikes",WIDTH/2,100,200)
+
+
+        pushMatrix()
+        --radians = math.rad(angle)
+        translate(WIDTH/2,HEIGHT-loopY)
+        rotate(270)
+    
+          
+            sprite("Platformer Art:Guy Jump")
+            
+    
+
+        popMatrix()
+    
+        if theEnd == true then
+            
+        font("Georgia")
+        fill(255)
+        fontSize(20)
+        textWrapWidth(400)
+        textMode(CENTER)     
+        text("The End.", WIDTH/2, HEIGHT - HEIGHT/4)
+        text("Let's keep this G rated shall we?",WIDTH/2, HEIGHT - HEIGHT/4-50)
+        text("Many thanks to all those who helped make the competiton happen and the codea app work", WIDTH/2, HEIGHT - HEIGHT/4-125)
+       -- text("No thanks whatsoever to you the user who seem to enjoy sending innocent bits to an untimely demise =)",WIDTH/2, HEIGHT - HEIGHT/4-200)
+        
+        
+        
+        
+        end
+    
+    
+        sceneTimer = sceneTimer + 1    
+        
+        if HEIGHT-loopY > 150 then
+        loopY = loopY + 5
+        else 
+        theEnd = true
+        end
+        
+end
+
+
+DrawText = class()
+
+function DrawText:init(words, yesNo)
+    -- you can accept and set parameters here
+    self.words = words
+    self.yesNo = yesNo
+end
+
+function DrawText:draw()
+    -- Codea does not automatically call this method
+fill(40,40,50)
+rectMode(CENTER)
+
+
+strokeWidth(5)
+stroke(255,255,255)
+rect(WIDTH-200,HEIGHT-100,215,150)
+
+font("Georgia")
+fill(255)
+fontSize(20)
+textWrapWidth(200)
+textMode(CENTER)
+text(self.words, WIDTH-200, HEIGHT-100)
+
+    if self.yesNo == true then
+        fill(100,100,100)
+        ellipse(WIDTH/2-150,100,100,100)
+        
+        ellipse(WIDTH/2+150,100,100,100)
+        
+       -- noFill()
+       -- strokeWidth(5)
+       -- stroke(255,255,255)
+        
+        --rect(WIDTH-310,HEIGHT-210,215,150)
+        --textMode()
+        fill(255,255,255)
+        text("Yes",WIDTH/2-150,100)
+        text("No",WIDTH/2+150,100)
+        --print("true")
+    
+    end
+
+end
+
+function DrawText:touched(touch)
+    -- Codea does not automatically call this method
+    if DrawText:CheckForTouchInCircle(touch.x,touch.y,WIDTH/2-150,100) then
+        return "yes"
+        end
+        
+    if DrawText:CheckForTouchInCircle(touch.x,touch.y,WIDTH/2+150,100) then
+        return "no"
+        end
+    
+end
+
+function DrawText:CheckForTouchInCircle(touchX ,touchY,circleX,circleY)
+    local distance = 0
+    
+    distance = math.sqrt(((touchX-circleX)^2) + ((touchY-circleY)^2))
+    
+    if distance <= 50 then 
+    return true
+    else 
+    return false
+    end
+end
+
+function Scene1Setup()
+    
+    question = DrawText("Now Bit, you have an important decision to make.  Do you jump off the cliff?", true)
+
+    walkToSafety = DrawText("Well done.  A sound and safe decision. Bit lived happily ever after.  THE END", false)
+    wts2 = DrawText("No, no, no. This can't be the end. What kind of story would that be? Here let me help you just a 'bit'.")
+    
+    jump = DrawText("What!? Bad bit. What kind of bit willingly jumps off a cliff! Oh this is not good. Not good at all.") 
+    jump2 = DrawText("Oh wait, I understand now. I am sorry. I didn't realize you were an 'odd' parity bit. Well done!")
+    
+    cloudX = WIDTH/2
+    cloudX2 = 0
+    sceneTimer = 0
+    
+    playerY = HEIGHT/2+50
+    sprite1 = true
+    x=0
+    y=0
+    
+end
+        
+function Scene1()
+     --background(0, 109, 255, 255)
+    
+    
+
+    background(0, 159, 255, 255)
+   -- sprite("Dropbox:sky2",WIDTH/2,HEIGHT/2,WIDTH, HEIGHT)
+    sprite("Platformer Art:Cloud 2", cloudX, HEIGHT-150)
+    sprite("Platformer Art:Cloud 2", cloudX2, HEIGHT/2-150)
+    --sprite("Dropbox:Cliff2", 120, HEIGHT/2)
+    sprite("Platformer Art:Block Grass", 100, HEIGHT/2-23,260,80)
+    
+    
+    if sprite1 == true then
+    sprite("Platformer Art:Guy Look Right", playerX, HEIGHT/2+50, 50)
+    end
+
+   -- sprite("Platformer Art:Block Grass",50,400)
+    
+    --walk to edge of cliff
+    if sceneTimer < 210 then
+    playerX = playerX + 1
+    end
+    
+    --ask a question
+    if sceneTimer == 210 then
+       
+         question:draw()
+      
+        pause = true
+        
+        if(CurrentTouch.state==BEGAN) then
+        response =  question:touched(CurrentTouch)
+        
+        if response == "yes" then
+            pause = false
+            print("yes")
+            end
+        if response == "no" then
+            pause = false
+            print("no")
+            end
+        end
+    end
+    
+    --now the fun begins
+    
+    --if the answer is no walk to safety
+    if response == "no" then
+        if sceneTimer > 210 and sceneTimer < 350 then
+        
+            playerX = playerX - 1
+        
+        end
+    --tell Bit he is about to be punched off the cliff.
+        if sceneTimer >= 350 and sceneTimer < 650 then 
+            --pause = true
+            walkToSafety:draw()
+        end
+        
+        if sceneTimer >= 700 and sceneTimer < 1100 then
+            wts2:draw()
+        end
+        
+        if sceneTimer >= 1150 and sceneTimer < 1300 then
+            sprite("Tyrian Remastered:Mine Spiked Huge", 25, HEIGHT/2+37)
+        end
+        
+        if sceneTimer >= 1300 and sceneTimer < 1500 then
+            sprite("Tyrian Remastered:Explosion Huge", 25, HEIGHT/2+37)
+            
+        end
+        if sceneTimer >= 1300 and sceneTimer < 1600 then
+            sprite1 = false
+            sprite("Platformer Art:Guy Jump", playerX + x, HEIGHT/2+37+y)
+            --playerX = playerX + 2
+            x = x + 3
+            y = 1.75*x - .01*x*x
+            --playerY = playerY + .015*(playerX-210)-.01178*playerX*playerX
+        end     
+        if sceneTimer >= 1700 then
+            scene1Playing = false
+        end
+        
+    end --end of response == no
+    
+    
+    if response == "yes" then
+        if sceneTimer > 210 and sceneTimer < 350 then
+            sprite1 = false
+            sprite("Platformer Art:Guy Jump", playerX + x, HEIGHT/2+37+y)
+            --playerX = playerX + 2
+            x = x + 3
+            y = 1.75*x - .01*x*x
+        end
+        if sceneTimer >= 350 and sceneTimer < 650 then
+            jump:draw()
+        end
+        if sceneTimer >= 750 and sceneTimer < 1150 then
+            jump2:draw()
+        end
+        if sceneTimer >= 1350 then
+            scene1Playing = false
+            return
+        end 
+    end 
+    if pause == false then
+        sceneTimer = sceneTimer + 1
+    end
+    
+    cloudX = cloudX - 1
+    cloudX2 = cloudX2 -1
+    if cloudX < -100 then cloudX = WIDTH+100;end
+    if cloudX2 < -100 then cloudX2 = WIDTH+100;end
+    
+end
+
+function Scene2Setup()
+    
+    --lastResponse = "no"
+    --if bit voluntarily jumped...
+    vJump = DrawText("Free fall is bliss isn't it? It must be nice to represent an odd sequence of bits. Gives a certain parity to life doesn't it?", false)
+    vJump2 = DrawText("Well I hate to burst your bubble, but I'd like to give you a free preview of what comes next.", false)
+    
+    vJump3 = DrawText("No those were not pretty mountains. Those were stainless steel spikes.", false)
+    vJump4 = DrawText("They are waiting for you. Based on this knowledge, would you like me to help you?", true)
+    
+    vJump5y = DrawText("Really? I'm surprised an odd bit like you doesn't like being skewered alive.", false)
+    vJump6y = DrawText("Very well. Notice your terminal velocity is precisely 88 mph. Now let me give you something.")
+    vJump7y = DrawText("No, it's not a parachute. It's a portable nuclear generator. It produces 1.21 gigawatts of electricity.")
+    vJump8y = DrawText("When activated it will take you back to a very special day.")
+    vJump9y = DrawText("ACTIVATE!")
+    
+    --if the user chose no.......
+    vJump5n = DrawText("What do you mean no? Are you blind? Didn't you like my preview? Your lack of concern scares me.")
+    
+    vJump6n = DrawText("Wait. Some stray subatomic particle must have caused you to change state by accident. Let's try again. Help?", true)
+    
+    vJump7nn = DrawText("Alas, I love you Bit. Enough to respect your odd 2 state wishes.")
+    
+    vJump7ny = DrawText("Oh good. You really had me worried there for a 'bit'.")
+    
+    nJump = DrawText("I am glad too see you smiling so soon. It warms my heart. I promise I am not a heartless person.")
+    nJump2 = DrawText("Hmmm then again. After I show you this, you might really think I don't have a heart.")
+    
+    nJump5y = DrawText("Oh good. You still trust me. I was worried after the mine incident and all.")
+    
+    nJump5n = DrawText("I knew this would happen. You don't trust me because of that mine incident. I really do have your best interests at heart.")
+    
+    nJump6n = DrawText("So I am going to give you a second chance at avoiding those cold spikes down below. Would you like help?", true)
+    
+    nJump7nn = DrawText("I feel bad. I really do care for you. This is really not how it's supposed to go down, yet down you go!")
+    
+    sceneTimer = 0
+    scaleTimer = 1.0
+    pause = false
+    angle = 90
+    cloudY = HEIGHT/2
+    cloudY2 = 0
+    scaredSprite = false
+    response = nil
+    response2 = nil
+    drawPack = false
+    drawPlayer = true
+    drawWarp = false
+
+    scene2SetupComplete = true   
+end
+
+--falls rotates slowly.  oh how happy he looks.  glad hes forgiven me
+--so happy in free fall.  happy with your choice.  well how about a preview?
+--so, would you like me to help you?
+
+function Scene2()
+    
+    --run once and only once
+    if scene2SetupComplete == false then
+        Scene2Setup()
+    end
+
+    background(0, 159, 255, 255)
+   -- sprite("Dropbox:sky2",WIDTH/2,HEIGHT/2,WIDTH, HEIGHT)
+    sprite("Platformer Art:Cloud 2", WIDTH/4, cloudY)
+    sprite("Platformer Art:Cloud 2", WIDTH - WIDTH/4, cloudY2)
+    
+    --if drawPlayer == true then
+        pushMatrix()
+        radians = math.rad(angle)
+        translate(WIDTH/2+75*math.sin(radians),HEIGHT/2)
+        rotate(angle)
+    
+        if drawPlayer == true then
+            
+            if drawPack == true then
+                sprite("Tyrian Remastered:Capsule Mecha")
+            end
+    
+            if scaredSprite == false then
+                sprite("Platformer Art:Guy Standing")
+            else
+                sprite("Platformer Art:Guy Jump")
+            end
+        
+        end
+        
+        if drawWarp == true then
+            scale(scaleTimer)
+            sprite("Space Art:Cloudy Nebula")
+        end
+
+        popMatrix()
+    --end
+--based on what they chose last time....
+
+    if lastResponse == "yes" then
+        
+        if sceneTimer > 200 and sceneTimer < 700 then
+            vJump:draw()
+        end
+        if sceneTimer >= 750 and sceneTimer < 1150 then
+            vJump2:draw()
+        end
+        
+        --preview
+        if sceneTimer >= 1200 and sceneTimer < 1400 then
+            background(0,0,0)
+            sprite("Platformer Art:Spikes",WIDTH/2, 250, 500)
+            scaredSprite = true
+        end
+        
+        if sceneTimer >= 1500 and sceneTimer < 1900 then
+            vJump3:draw()
+
+        end
+        
+        
+        if sceneTimer == 2000 then
+            vJump4:draw()
+            pause = true
+            
+            if(CurrentTouch.state==BEGAN) then
+                response =  question:touched(CurrentTouch)
+        
+                if response == "yes" then
+                    pause = false
+                    print("yes")
+                end
+                if response == "no" then
+                    pause = false
+                    print("no")
+                end
+            end   
+        end
+        
+        if response == "yes" then
+            
+            text("Velocity: 88 mph", WIDTH - WIDTH/4, HEIGHT/4)
+            if sceneTimer >= 2100 and sceneTimer < 2500 then
+            vJump5y:draw()
+            end
+            if sceneTimer >= 2600 and sceneTimer < 3000 then
+            vJump6y:draw()
+            end
+            if sceneTimer >= 3100 then
+                drawPack = true
+                scaredSprite = false
+            end
+            if sceneTimer >= 3200 and sceneTimer < 3600 then
+            vJump7y:draw()
+            end
+            if sceneTimer >= 3700 and sceneTimer < 4100 then
+            vJump8y:draw()
+            end
+            if sceneTimer >= 4200 and sceneTimer < 4500 then
+            vJump9y:draw()
+            end
+            if sceneTimer >= 4350 and sceneTimer < 4450 then
+                drawPlayer = false
+                scaleTimer = scaleTimer - .01
+                drawWarp = true
+            end   
+            if sceneTimer >= 4550 then
+                scene2Playing = false
+                return
+            end
+        end
+        
+        --no chosen the first time
+        if response == "no" then
+            scaredSprite = false
+            if sceneTimer >= 2100 and sceneTimer < 2500 then
+            vJump5n:draw()
+            end
+            if sceneTimer == 2600 then
+            vJump6n:draw()
+            pause = true
+            
+                if(CurrentTouch.state==BEGAN) then
+                response2 =  question:touched(CurrentTouch)
+        
+                if response2 == "yes" then
+                    pause = false
+                    print("yes")
+                end
+                if response2 == "no" then
+                    pause = false
+                    print("no")
+                end
+                end   
+            end
+            
+            if response2 == "no" then
+                if sceneTimer >= 2700 and sceneTimer < 3100 then
+                    vJump7nn:draw()
+                end
+                
+                if sceneTimer >= 3200 then
+                    scene2Playing = false
+                    spikedEndScenePlaying = true
+                    drawPlayer = true
+                    sceneTimer = 0
+                   -- print("spike scene should happen")
+                    return
+                end 
+            end
+            
+            if response2 == "yes" then
+                
+                if sceneTimer >= 2700 and sceneTimer < 3100 then
+                    vJump7ny:draw()
+                end    
+                
+            text("Velocity: 88 mph", WIDTH - WIDTH/4, HEIGHT/4)
+            if sceneTimer >= 3150 and sceneTimer < 3550 then
+            sceneTimer = 3550
+            end
+            if sceneTimer >= 3600 and sceneTimer < 4000 then
+            vJump6y:draw()
+            end
+            if sceneTimer >= 4100 then
+                drawPack = true
+                scaredSprite = false
+            end
+            if sceneTimer >= 4200 and sceneTimer < 4600 then
+            vJump7y:draw()
+            end
+            if sceneTimer >= 4700 and sceneTimer < 5100 then
+            vJump8y:draw()
+            end
+            if sceneTimer >= 5200 and sceneTimer < 5600 then
+            vJump9y:draw()
+            end
+            if sceneTimer >= 5200 and sceneTimer < 5300 then
+                drawPlayer = false
+                scaleTimer = scaleTimer - .01
+                drawWarp = true
+            end 
+            if sceneTimer >= 5400 then
+                scene2Playing = false
+                return
+            end
+         
+        end  --end of response2 = yes
+              --  if sceneTimer >= 
+            
+            
+            
+        end --end of no the first time
+        
+        
+        
+        
+        
+
+    end --end of if yes was chosen last time
+    
+    
+     if lastResponse == "no" then
+        
+        if sceneTimer > 200 and sceneTimer < 700 then
+            nJump:draw()
+        end
+        if sceneTimer >= 750 and sceneTimer < 1150 then
+            nJump2:draw()
+        end
+        
+        --preview
+        if sceneTimer >= 1200 and sceneTimer < 1400 then
+            background(0,0,0)
+            sprite("Platformer Art:Spikes",WIDTH/2, 250, 500)
+            scaredSprite = true
+        end
+        
+        if sceneTimer >= 1500 and sceneTimer < 1900 then
+            vJump3:draw()
+
+        end
+        
+        
+        if sceneTimer == 2000 then
+            vJump4:draw()
+            pause = true
+            
+            if(CurrentTouch.state==BEGAN) then
+                response =  question:touched(CurrentTouch)
+        
+                if response == "yes" then
+                    pause = false
+                    print("yes")
+                end
+                if response == "no" then
+                    pause = false
+                    print("no")
+                end
+            end   
+        end
+        
+        if response == "yes" then
+            
+            text("Velocity: 88 mph", WIDTH - WIDTH/4, HEIGHT/4)
+            if sceneTimer >= 2100 and sceneTimer < 2500 then
+            nJump5y:draw()
+            end
+            if sceneTimer >= 2600 and sceneTimer < 3000 then
+            vJump6y:draw()
+            end
+            if sceneTimer >= 3100 then
+                drawPack = true
+                scaredSprite = false
+            end
+            if sceneTimer >= 3200 and sceneTimer < 3600 then
+            vJump7y:draw()
+            end
+            if sceneTimer >= 3700 and sceneTimer < 4100 then
+            vJump8y:draw()
+            end
+            if sceneTimer >= 4200 and sceneTimer < 4500 then
+            vJump9y:draw()
+            end
+            if sceneTimer >= 4350 and sceneTimer < 4450 then
+                drawPlayer = false
+                scaleTimer = scaleTimer - .01
+                drawWarp = true
+            end   
+            if sceneTimer >= 4550 then
+                scene2Playing = false
+                return
+            end
+        end
+        
+        
+                --no chosen the first time
+        if response == "no" then
+            scaredSprite = false
+            if sceneTimer >= 2100 and sceneTimer < 2500 then
+            nJump5n:draw()
+            end
+            if sceneTimer == 2600 then
+            nJump6n:draw()
+            pause = true
+            
+                if(CurrentTouch.state==BEGAN) then
+                response2 =  question:touched(CurrentTouch)
+        
+                if response2 == "yes" then
+                    pause = false
+                    print("yes")
+                end
+                if response2 == "no" then
+                    pause = false
+                    print("no")
+                end
+                end   
+            end
+        
+        
+
+            if response2 == "no" then
+                if sceneTimer >= 2700 and sceneTimer < 3100 then
+                    nJump7nn:draw()
+                end
+                
+                if sceneTimer >= 3200 then
+                    scene2Playing = false
+                    spikedEndScenePlaying = true
+                    drawPlayer = true
+                    sceneTimer = 0
+                    return
+                end 
+            end
+            
+            if response2 == "yes" then
+                
+                if sceneTimer >= 2700 and sceneTimer < 3100 then
+                    vJump7ny:draw()
+                end    
+                
+            text("Velocity: 88 mph", WIDTH - WIDTH/4, HEIGHT/4)
+            if sceneTimer >= 3150 and sceneTimer < 3550 then
+            sceneTimer = 3550
+            end
+            if sceneTimer >= 3600 and sceneTimer < 4000 then
+            vJump6y:draw()
+            end
+            if sceneTimer >= 4100 then
+                drawPack = true
+                scaredSprite = false
+            end
+            if sceneTimer >= 4200 and sceneTimer < 4600 then
+            vJump7y:draw()
+            end
+            if sceneTimer >= 4700 and sceneTimer < 5100 then
+            vJump8y:draw()
+            end
+            if sceneTimer >= 5200 and sceneTimer < 5600 then
+            vJump9y:draw()
+            end
+            if sceneTimer >= 5200 and sceneTimer < 5300 then
+                drawPlayer = false
+                scaleTimer = scaleTimer - .01
+                drawWarp = true
+            end 
+            if sceneTimer >= 5400 then
+                scene2Playing = false
+                return
+            end
+         
+        end  --end of response2 = yes
+    end
+            
+        
+        
+    end --end of if lastresponse was no.
+    
+
+    if pause == false then
+        sceneTimer = sceneTimer + 1
+    end
+    
+    angle = angle + 1
+    
+    cloudY = cloudY + 5
+    cloudY2 = cloudY2 + 5
+    if cloudY > HEIGHT+ 100 then cloudY = -100;end
+    if cloudY2 > HEIGHT+ 100 then cloudY2 = -100;end
+
+end
+
+function Scene3Setup()
+    
+    time = DrawText("Today's date: November 30th, 2011")
+    finalQ1 = DrawText("Bit. This is it. Your answer here determines if you join others to form a fully functioning byte.")
+    finalQ2 = DrawText("Answer carefully. What do you get when you combine great code and a great idea?", true)
+    
+    finalQ3y = DrawText("Codea. Well done Bit. Exactly right. You successfully read my mind and answered correctly. You truly are amazing.")
+    
+    finalQ3n = DrawText("Ah, no. You were supposed to read my mind and know the answer to that ambiguous question. 50/50/90 I know.")
+    
+    
+    sceneTimer = 0
+    scaleTimer = 1.0
+    pause = false
+    angle = 90
+    
+    cloudX = WIDTH/2
+    cloudX2 = 0
+    showCodea = false
+
+    scaredSprite = false
+    response = nil
+    response2 = nil
+    drawPack = false
+    drawPlayer = true
+    drawWarp = false
+    drawDroppingBox = false
+    droppingBoxTimer = 0
+    droppingBoxY = 0
+
+    scene3SetupComplete = true  
+    
+end
+
+function Scene3()
+    
+    --run once and only once
+    if scene3SetupComplete == false then
+        Scene3Setup()
+    end
+    
+    background(0, 159, 255, 255)
+    sprite("Platformer Art:Cloud 2", cloudX, HEIGHT-150)
+    sprite("Platformer Art:Cloud 2", cloudX2, HEIGHT/2)
+    
+    spriteMode(CORNER)
+    
+    sprite("Platformer Art:Guy Look Right",WIDTH/4, 190)
+    sprite("Cargo Bot:Codea Icon", WIDTH/2, 164, 200)
+    
+    if drawDroppingBox == true then
+        
+        sprite("Cargo Bot:Codea Icon",WIDTH/4-50,droppingBoxY, 200)
+        droppingBoxY = HEIGHT-droppingBoxTimer
+        
+    end
+    --sprite("Cargo Bot:Codea Icon", WIDTH - WIDTH/4-100, 70, 200)
+    
+    sprite("Platformer Art:Block Grass", 0, -30,WIDTH,220)
+    
+    
+    spriteMode(CENTER)
+    if showCodea == true then
+        sprite("Cargo Bot:Codea Logo", WIDTH/2, HEIGHT - HEIGHT/4)
+    end
+    
+    
+    
+    
+    
+    if sceneTimer > 200 and sceneTimer < 700 then
+            time:draw()
+    end
+    
+    if sceneTimer > 800 and sceneTimer < 1200 then
+            finalQ1:draw()
+    end
+    
+    if sceneTimer == 1300 then 
+        pause = true
+        finalQ2:draw()
+        
+        if(CurrentTouch.state==BEGAN) then
+        response =  question:touched(CurrentTouch)
+        
+        if response == "yes" then
+            pause = false
+            print("yes")
+            end
+        if response == "no" then
+            pause = false
+            print("no")
+            end
+        end
+    end
+        
+    if response == "yes" then
+        
+    
+    
+        if sceneTimer >= 1450 and sceneTimer < 1950 then
+            finalQ3y:draw()  
+            showCodea = true
+        end
+        
+    end
+    
+    if response == "no" then
+        drawDroppingBox = true
+    
+    
+        if sceneTimer >= 1550 and sceneTimer < 2050 then
+            finalQ3n:draw()  
+            --showCodea = true
+        end
+        
+        if sceneTimer >= 2100 then
+            
+        font("Georgia")
+        fill(255)
+        fontSize(20)
+        textWrapWidth(400)
+        textMode(CENTER)     
+        text("The End.", WIDTH/2, HEIGHT - HEIGHT/4)
+        text("You're so close to the real ending. Try one more time.",WIDTH/2, HEIGHT - HEIGHT/4-50)
+        text("Many thanks to all those who helped make the competition happen and the codea app work", WIDTH/2, HEIGHT - HEIGHT/4-125)
+        end
+        droppingBoxTimer = droppingBoxTimer + 8
+        
+        if (HEIGHT-droppingBoxTimer < 164) then
+            droppingBoxY = 164
+            droppingBoxTimer = 2000
+        end
+        
+    end
+    
+    
+    
+    
+   -- sprite("Platformer Art:Block Grass", i*53-35,35
+
+    cloudX = cloudX - 1
+    cloudX2 = cloudX2 -1
+    if cloudX < -100 then cloudX = WIDTH+100;end
+    if cloudX2 < -100 then cloudX2 = WIDTH+100;end
+    
+    if pause == false then
+        sceneTimer = sceneTimer + 1
+    end
+    
+end
+    
